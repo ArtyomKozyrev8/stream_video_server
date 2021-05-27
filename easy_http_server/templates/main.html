@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Stream Server Easy Solution</title>
+</head>
+<body>
+    <h1>Video Stream Server Easy Solution</h1>
+
+    <div id="video_image">
+        <img id="video_image_img" src="">
+    </div>
+    <div id="image">
+        <img id="image_img" src="{{ url('get_one_image') }}">
+    </div>
+</body>
+<script>
+    // just to do some js activity, can be just static html:
+    window.onload = (ev) => {
+        let image = document.getElementById("video_image_img");
+        image.src = "/stream_video";
+    }
+</script>
+</html>
