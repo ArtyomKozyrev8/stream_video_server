@@ -44,8 +44,8 @@ async def video_remote_source(req: web.Request) -> web.WebSocketResponse:
             except RuntimeError as ex:
                 # we going to change number of items in req.app["to_browser_ws"]
                 # so from time to time you gonna get the error
-                logging.info(ex)
-    logging.info('websocket connection closed')
+                req.app["app_log"].error(ex)
+    req.app["app_log"].info('websocket connection closed')
     return ws
 
 
@@ -65,13 +65,13 @@ async def websocket_handler_site(req: web.Request) -> web.WebSocketResponse:
     # if we will not do it, ws will close itself
     async for _ in ws:
         pass
-    logging.info('websocket connection closed')
+    req.app["app_log"].info('websocket connection closed')
     return ws
 
 
 async def feed_websocket_handler_site(
         q: asyncio.Queue,
-        ws: web.WebSocketResponse
+        ws: web.WebSocketResponse,
 ) -> None:
     """Sends frame from remote camera (from async queue to client browser)"""
     while True:
@@ -93,23 +93,31 @@ async def feed_websocket_handler_site(
             break
 
 
-async def monitor_active_coroutines() -> None:
+async def monitor_active_coroutines(app: web.Application) -> None:
     """monitors whether we do garbage collection fine"""
     while True:
         tasks = len(asyncio.all_tasks())
-        logging.info(f"Number of active tasks: {tasks}")
+        app["app_log"].info(f"Number of active tasks: {tasks}")
         await asyncio.sleep(15)
 
 
 async def on_start(app: web.Application) -> None:
     """what should be started before server start"""
-    asyncio.create_task(monitor_active_coroutines())
+    asyncio.create_task(monitor_active_coroutines(app))
 
 
 def create_app(args=None) -> web.Application:
     """app factory"""
     app = web.Application()
     app.on_startup.append(on_start)
+    app_log = logging.getLogger("app_log")
+    app_log_handler = logging.StreamHandler()
+    fmt = logging.Formatter("%(levelname)s | %(asctime)s | %(message)s")
+    app_log_handler.setFormatter(fmt)
+    app_log.addHandler(app_log_handler)
+    app_log.setLevel(logging.INFO)
+    app_log.propagate = False
+    app["app_log"] = app_log
 
     app["cameras"] = WeakValueDictionary()  # stores cameras which send data to the app
     app["to_browser_ws"] = WeakKeyDictionary()  # stores client (browsers) sockets
