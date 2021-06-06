@@ -1,0 +1,65 @@
+body {
+    background-color: #393939;
+    margin-left: 30px;
+}
+
+h1 {
+    color: aliceblue;
+    font-size: 40px;
+}
+
+#video img {
+    margin-top: 20px;
+    border: 2px solid aliceblue;
+}
+
+#refresh {
+    background-color: aliceblue;
+    border: 1px;
+    color: black;
+    height: 40px;
+    padding: 0px 26px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 24px;
+}
+
+#refresh:hover {
+    background: darkgray;
+    color: white;
+    border: 1px solid white;
+}
+
+#cameras {
+    position: relative;
+    background-color: aliceblue;
+    border: 1px;
+    color: black;
+    text-align: center;
+    width: 560px;
+    height: 40px;
+    margin-right: 10px;
+    font-size: 20px;
+}
+
+#cameras:hover {
+    background: darkgray;
+    color: white;
+    border: 1px solid white;
+}
+
+#cameras select {
+  display: none; /*hide original SELECT element: */
+}
+
+/* Style items (options): */
+#cameras option {
+    position: absolute;
+    background-color: white;
+    color: black;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 99;
+}
