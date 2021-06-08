@@ -1,0 +1,24 @@
+version: '3.8'
+services:
+  video_server:
+    image: video_server:latest
+    container_name: video_server
+    hostname: video_server
+    networks:
+      - video_server_net
+    restart: always
+  video_ng:
+    image: video_ng:latest
+    container_name: video_ng
+    hostname: video_ng
+    depends_on:
+      - video_server
+    ports:
+      - 7474:7474
+    networks:
+      - video_server_net
+    restart: always
+networks:
+  video_server_net:
+    name: video_server_net
+    driver: bridge
