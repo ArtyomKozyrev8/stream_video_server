@@ -1,14 +1,19 @@
+import asyncio
+from collections import namedtuple
+from datetime import datetime, timedelta
+from enum import Enum
+import logging
+from typing import Dict, Any
+from weakref import WeakKeyDictionary, WeakValueDictionary
+
 from aiohttp import web, WSMsgType
 import aiohttp_jinja2
 import jinja2
-from typing import Dict, Any
-import logging
-from weakref import WeakKeyDictionary, WeakValueDictionary
-import asyncio
-from datetime import datetime, timedelta
-from enum import Enum
 
-LOG_LEVEL = logging.INFO
+LOG_LEVEL = logging.INFO  # choose logging level for the app
+
+CamIdQueuePair = namedtuple("QueueClientWsPair", ["cam_id", "queue"])
+FrameTimestamp = namedtuple("FrameTimestamp", ["timestamp", "video_frame"])
 
 
 class NotifyCamera(Enum):
@@ -34,9 +39,11 @@ class CamerasHandler:
             if msg.type == WSMsgType.BINARY:
                 try:
                     for cl_ws, val in req.app["to_browser_ws"].items():
-                        if cam_id == val[0]:
+                        if cam_id == val.cam_id:
                             # datetime.now() is used to drop too slow clients
-                            val[1].put_nowait((datetime.now(), msg.data, ))
+                            val.queue.put_nowait(
+                                FrameTimestamp(timestamp=datetime.now(), video_frame=msg.data),
+                            )
                 except RuntimeError as ex:
                     # we going to change number of items in req.app["to_browser_ws"]
                     # so from time to time you gonna get the error
@@ -59,10 +66,11 @@ class BrowserClientWSHandler:
         cam_id = req.match_info["cam_id"]
         q = asyncio.Queue()
         # cam_id is used to understand whether the socket should get update
-        # from the certain remote camera
+        # from the certain remote camera source,
+        # we use model one client ws = one video source
         # q is dedicated to each client oriented websocket
-        req.app["to_browser_ws"][ws] = (cam_id, q, )
-        asyncio.create_task(BrowserClientWSHandler._feed_from_client_browser_websocket(q, ws, ))
+        req.app["to_browser_ws"][ws] = CamIdQueuePair(cam_id=cam_id, queue=q)  # (cam_id, q, )
+        asyncio.create_task(BrowserClientWSHandler._feed_from_client_browser_websocket(q=q, ws=ws))
         await ws.prepare(req)
         # monitor messages from client
         # if we will not do it, ws will close itself
@@ -84,14 +92,14 @@ class BrowserClientWSHandler:
             if ws.closed:
                 break
             try:
-                if datetime.now() - data[0] > timedelta(seconds=1.5):
+                if datetime.now() - data.timestamp > timedelta(seconds=1.5):
                     with open("ws_http_server/static/slow_connection.png", mode="rb") as f:
                         data = f.read()
                     await ws.send_bytes(data)
                     await ws.close()
                     break
                 else:
-                    await ws.send_bytes(data[1])
+                    await ws.send_bytes(data.video_frame)
             except (ConnectionAbortedError, ConnectionResetError):
                 break
 
@@ -112,7 +120,7 @@ class MonitoringOPs:
                     for browser_ws, val in self.app["to_browser_ws"].items():
                         if browser_ws.closed:
                             continue
-                        if cam_id == val[0]:
+                        if cam_id == val.cam_id:
                             await ws.send_bytes(NotifyCamera.resume.value)  # resume frames
                             self.app["app_log"].debug(f"asked {cam_id} continue sending frames")
                             break  # no need to continue
@@ -176,8 +184,10 @@ def create_app(args=None) -> web.Application:
     app_log.propagate = False
     app["app_log"] = app_log
 
-    app["cameras"] = WeakValueDictionary()  # stores cameras which send data to the app
-    app["to_browser_ws"] = WeakKeyDictionary()  # stores client (browsers) sockets
+    # stores cameras which send data to the app
+    app["cameras"] = WeakValueDictionary()  # key - cam_id, val - ws
+    # stores client (browsers) sockets
+    app["to_browser_ws"] = WeakKeyDictionary()  # key - ws, val - CamIdQueuePair
 
     app.add_routes([web.static('/static', "ws_http_server/static")])
     aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("ws_http_server/templates"))
