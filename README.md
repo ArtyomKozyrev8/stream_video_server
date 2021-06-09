@@ -93,6 +93,9 @@ _Cons:_
 
 ##### **_How to deploy application with Docker or/and Docker-Compose:_**
 
+**_Note:_** you still have to run `python video_source_process/vid_s_pr.py` (Video Processing App) without Docker, though it is possible
+to run OpenCV app in docker, you need to to use `--device=` docker flag to use default camera by index.
+
 1. Create Images and run with the help of Docker-Compose:
 
 1.1 `docker build -t video_ng . // run command in nginx folder`
