@@ -7,10 +7,17 @@
     <link rel="stylesheet" href="/static/index.css">
     <link rel="icon" type="image/png" href="/static/favicon.png"/>
 </head>
-<body>
-    <h1>Video Stream Server WS based Solution</h1>
-    <select name="cameras" id="cameras"></select>
-    <button id="refresh">&#x21bb;</button>
+<body class="dark">
+    <div>
+        <button class="btn dark" id="color_mode">&#9728;</button>
+    </div>
+    <div>
+        <h1 class="dark">Video Stream Server WS based Solution</h1>
+    </div>
+    <div>
+        <select class="camera_select dark" id="cameras" title="Select Camera"></select>
+        <button class="btn dark" id="refresh" title="Refresh Camera List">&#x21bb;</button>
+    </div>
     <div id="video"></div>
 </body>
 </html>

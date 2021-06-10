@@ -1,22 +1,14 @@
 body {
-    background-color: #393939;
     margin-left: 30px;
+    margin-right: 30px;
 }
 
-h1 {
-    color: aliceblue;
-    font-size: 40px;
-}
+body.dark { background-color: #393939; }
+body.light { background-color: white; }
 
-#video img {
-    margin-top: 20px;
-    border: 2px solid aliceblue;
-}
-
-#refresh {
-    background-color: aliceblue;
+.btn {
+    border-radius: 5%;
     border: 1px;
-    color: black;
     height: 40px;
     padding: 0px 26px;
     text-align: center;
@@ -25,17 +17,18 @@ h1 {
     font-size: 24px;
 }
 
-#refresh:hover {
-    background: darkgray;
-    color: white;
-    border: 1px solid white;
+#color_mode {
+    float: right;
+    margin-right: 10px;
 }
 
-#cameras {
+#color_mode {
+    width: 80px;
+}
+
+.camera_select {
     position: relative;
-    background-color: aliceblue;
     border: 1px;
-    color: black;
     text-align: center;
     width: 560px;
     height: 40px;
@@ -43,18 +36,12 @@ h1 {
     font-size: 20px;
 }
 
-#cameras:hover {
-    background: darkgray;
-    color: white;
-    border: 1px solid white;
-}
-
-#cameras select {
+.camera_select select {
   display: none; /*hide original SELECT element: */
 }
 
 /* Style items (options): */
-#cameras option {
+.camera_select option {
     position: absolute;
     background-color: white;
     color: black;
@@ -63,3 +50,63 @@ h1 {
     right: 0;
     z-index: 99;
 }
+
+.dark.btn {
+    background-color: aliceblue;
+    color: black;
+}
+
+.dark.btn:hover {
+    background: darkgray;
+    color: white;
+    border: 1px solid white;
+}
+
+.dark.camera_select {
+    background-color: aliceblue;
+    color: black;
+}
+
+.dark.camera_select {
+    background: aliceblue;
+    color: black;
+    border: 1px solid white;
+}
+
+.dark.camera_select:hover {
+    background-color: darkgray;
+    color: white;
+}
+
+h1 { font-size: 48px; }
+h1.dark  { color: aliceblue; }
+h1.light { color: black; }
+
+img.dark  { border: 3px solid aliceblue; }
+img.light { border: 3px solid black; }
+
+.light.btn {
+    background-color: black;
+    color: whitesmoke;
+    border: 3px solid black;
+}
+
+.light.btn:hover {
+    background: whitesmoke;
+    color: black;
+    border: 3px solid black;
+}
+
+.light.camera_select {
+    background-color: black;
+    color: whitesmoke;
+    border: 3px solid black;
+}
+
+.light.camera_select:hover {
+    background: whitesmoke;
+    color: black;
+    border: 3px solid black;
+}
+
+#video img { margin-top: 20px; }

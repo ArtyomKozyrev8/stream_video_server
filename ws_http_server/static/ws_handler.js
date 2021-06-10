@@ -1,7 +1,8 @@
 window.onload = (event) => {
     const btnRefresh = document.getElementById("refresh");
+    const btnColorMode = document.getElementById("color_mode");
     const camerasSelect = document.getElementById("cameras");
-    let camera_list_box_ops = new CameraListBoxOps()
+    let camera_list_box_ops = new CameraListBoxOps();
 
     camera_list_box_ops.get_cameras(camerasSelect); // fill camerasSelect with option on page load
 
@@ -23,8 +24,23 @@ window.onload = (event) => {
     btnRefresh.addEventListener("click", ev => {
         camera_list_box_ops.get_cameras(camerasSelect);
     })
-};
 
+    btnColorMode.addEventListener("click", ev => {
+        let start_color = "light";
+        let end_color = "dark";
+        ev.target.innerHTML = "&#9728";
+        if (ev.target.className.includes("dark")) {
+            start_color = "dark";
+            end_color = "light";
+            ev.target.innerHTML = "&#9790";
+        }
+        let elements = document.getElementsByClassName(start_color);
+        let elements_array = Array.from(elements);
+        for (let i = 0; i < elements_array.length; i++) {
+            elements_array[i].className = elements_array[i].className.replace(start_color, end_color);
+        }
+    })
+};
 
 class WsOps {
     constructor() {
@@ -57,6 +73,13 @@ class WsOps {
         const imgDiv = document.getElementById("video");
         imgDiv.innerHTML = "";
         const img = document.createElement("img");
+        const btnColorMode = document.getElementById("color_mode");
+        if (btnColorMode.className.includes("dark")) {
+            img.className = "dark";
+        } else {
+            img.className = "light";
+        }
+
         imgDiv.appendChild(img);
 
         if (this.socket !== null) {
@@ -92,7 +115,7 @@ class CameraListBoxOps {
      */
     {
         let cameras = data["cameras"];
-        camerasSelect.innerHTML = "<option disabled selected value> -- select camera to watch -- </option>";
+        camerasSelect.innerHTML = "<option disabled selected value> --- select camera to watch --- </option>";
         for (let i = 0; i < cameras.length; i++) {
             let option = document.createElement("option");
             option.value = cameras[i];
