@@ -14,9 +14,8 @@ more tutorial-like code, start from the 1st and the 2nd implementations.
 
 The application is composed of two services: 1. http server 2. video processing process 3. Optionally Nginx
 
-![Screenshot One](screen_shorts/pic_1.png)
-![Screenshot Two](screen_shorts/pic_2.png)
-![Screenshot aGif Three](screen_shorts/pic_3.gif)
+![Screenshot One](screen_shorts/gif-1.gif)
+![Screenshot Two](screen_shorts/gif-2.gif)
 
 ### **First One: The Easiest Video Server Implementation:**
 
@@ -68,9 +67,7 @@ _1. How to run Websocket Video Server Implementation:_
 
 2. install all requirement from `requirement.txt`
 
-3. `python -m aiohttp.web -H 0.0.0.0 -P 7474 ws_http_server:create_app`
- or 
- `python3 -m aiohttp.web -H 0.0.0.0 -P 7474 ws_http_server:create_app`
+3. `python -m aiohttp.web -H 0.0.0.0 -P 7474 ws_http_server:create_app` // `python3` in Linux
 
 _2. How to run Video Processing Process_
 
