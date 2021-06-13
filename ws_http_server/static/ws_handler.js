@@ -1,30 +1,22 @@
 window.onload = (event) => {
-    const btnRefresh = document.getElementById("refresh");
-    const btnColorMode = document.getElementById("color_mode");
-    const camerasSelect = document.getElementById("cameras");
-    let camera_list_box_ops = new CameraListBoxOps();
+    const btnRefresh = document.getElementById("refresh"); // refresh list of cameras
+    const btnColorMode = document.getElementById("color_mode"); // day/night changer
+    const camerasSelect = document.getElementById("cameras"); // select camera to watch
+    // div to store video-containers divs
+    const videosContainersDiv = document.getElementById("videos_containers");
+    const camera_list_box_ops = new CameraListBoxOps();     // ops related to camera selector
+    const btnAdd = document.getElementById("addBtn"); // temp btn
+    // list of video containers, used to close ws if browser tav is closed
+    const videoContainers = new Array();
 
     camera_list_box_ops.get_cameras(camerasSelect); // fill camerasSelect with option on page load
-
-    let ws_ops = new WsOps(); // handle all websocket ops on the page
-
-    // close socket on folder close
-    window.addEventListener("beforeunload", function(e){
-       if (ws_ops.socket !== null) {
-           ws_ops.socket.close();
-       }
-    }, false);
-
-    // when select change handle new websocket
-    camerasSelect.addEventListener("change", ev => {
-        ws_ops.create_web_socket_connection(ev.target.value);
-    })
 
     // refresh camera list
     btnRefresh.addEventListener("click", ev => {
         camera_list_box_ops.get_cameras(camerasSelect);
     })
 
+    // change color mode
     btnColorMode.addEventListener("click", ev => {
         let start_color = "light";
         let end_color = "dark";
@@ -40,11 +32,48 @@ window.onload = (event) => {
             elements_array[i].className = elements_array[i].className.replace(start_color, end_color);
         }
     })
+    // adds another one VideoContainer
+    btnAdd.addEventListener("click", ev => {
+        let vContainer = new VideoContainer("cam_100500")
+        let vContainerDiv = vContainer.create_element();
+        videosContainersDiv.appendChild(vContainerDiv);
+        // is used on tab close
+        videoContainers.push(vContainer);
+    })
+
+    // close socket on tab close
+    window.addEventListener("beforeunload", function(e){
+        for (let i=0; i<videoContainers.length; i++) {
+            // check state of video container
+            if (videoContainers[i].state === "active") {
+                videoContainers[i].close_ws();
+            }
+        }
+    }, false);
 };
 
-class WsOps {
-    constructor() {
-        this.socket = null;
+class VideoContainer {
+    constructor(camera) {
+        this.ws = VideoContainer.create_ws(camera);
+        this.state = "active"; // used on tab close
+    }
+
+    static create_ws(camera) {
+        /**
+         * creates websocket
+         * @type {URL}
+         */
+        const socket_url = new URL(`websocket_handler_site/${camera}`, window.location.href);
+        socket_url.protocol = socket_url.protocol.replace('http', 'ws');
+        return new WebSocket(socket_url)
+    }
+
+    close_ws() {
+        /**
+         * closed websocket
+         */
+        this.ws.close();
+        this.state = "inactive";
     }
 
     static handle_web_socket_data(event, image)
@@ -62,34 +91,35 @@ class WsOps {
         }
     }
 
-    create_web_socket_connection(camera)
-    /**
-     * handles websocket connection with server
-     * @param camera name of camera - reveive from current select elemnt option
-     */
-    {
-        const socket_url = new URL(`websocket_handler_site/${camera}`, window.location.href);
-        socket_url.protocol = socket_url.protocol.replace('http', 'ws');
-        const imgDiv = document.getElementById("video");
-        imgDiv.innerHTML = "";
-        const img = document.createElement("img");
+    create_element() {
+        /**
+         * Creates elements in a div and returns the div
+         * @type {HTMLDivElement}
+         */
+        let div = document.createElement("div");
+        div.className = "video_container";
+        let removeBtn = document.createElement("button");
+        removeBtn.innerText = "x";
+        removeBtn.className = "remove_btn";
+        div.appendChild(removeBtn);
+        let video_img = document.createElement("img");
         const btnColorMode = document.getElementById("color_mode");
         if (btnColorMode.className.includes("dark")) {
-            img.className = "dark";
+            video_img.className = "dark";
         } else {
-            img.className = "light";
+            video_img.className = "light";
         }
 
-        imgDiv.appendChild(img);
+        div.appendChild(video_img);
 
-        if (this.socket !== null) {
-            this.socket.close();
-            this.socket.removeEventListener("message", WsOps.handle_web_socket_data);
-        }
-        this.socket = new WebSocket(socket_url);
-        this.socket.addEventListener('message', ev => {
-           WsOps.handle_web_socket_data(ev, img);
+        removeBtn.addEventListener("click", ev => {
+            this.close_ws();
+            ev.target.parentElement.parentElement.removeChild(ev.target.parentElement);
         })
+        this.ws.addEventListener('message', ev => {
+            VideoContainer.handle_web_socket_data(ev, video_img);
+        })
+        return div
     }
 }
 
