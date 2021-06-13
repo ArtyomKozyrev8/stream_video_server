@@ -82,6 +82,12 @@ h1 { font-size: 48px; }
 h1.dark  { color: aliceblue; }
 h1.light { color: black; }
 
+img {
+    width: 540px;
+    height: 390px;
+    z-index: -1;
+    position: absolute;
+}
 img.dark  { border: 3px solid aliceblue; }
 img.light { border: 3px solid black; }
 
@@ -109,4 +115,35 @@ img.light { border: 3px solid black; }
     border: 3px solid black;
 }
 
-#video img { margin-top: 20px; }
+button.remove_btn {
+    background-color: aliceblue;
+    border-radius: 50%;
+    color: black;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    border: 2px solid black;
+    float: right;
+    margin-top: 8px;
+    margin-right: 12px;
+}
+
+button.remove_btn:hover {
+    background-color: darkgray;
+    color: aliceblue;
+}
+
+.video_container {
+    width: 550px;
+    height: 400px;
+    margin-top: 10px;
+    margin-right: 10px;
+    justify-content: flex-start;
+    position: relative;
+}
+
+.videos_containers {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
