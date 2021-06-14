@@ -1,4 +1,5 @@
 window.onload = (event) => {
+    const MAX_VIDEO_CONTAINER_NUM = 12;
     const btnRefresh = document.getElementById("refresh"); // refresh list of cameras
     const btnColorMode = document.getElementById("color_mode"); // day/night changer
     const camerasSelect = document.getElementById("cameras"); // select camera to watch
@@ -34,14 +35,46 @@ window.onload = (event) => {
     })
     // adds another one VideoContainer
     btnAdd.addEventListener("click", ev => {
-        let vContainer = new VideoContainer("cam_100500")
-        let vContainerDiv = vContainer.create_element();
-        videosContainersDiv.appendChild(vContainerDiv);
-        // is used on tab close
-        videoContainers.push(vContainer);
+        // check if we already have
+        let continueWork = true;
+        let n = 0;
+        // calculate number of active video containers
+        for (let i=0; i<videoContainers.length; i++) {
+            if (videoContainers[i].state === "active") {
+                n += 1;
+            }
+        }
+        if (n >= MAX_VIDEO_CONTAINER_NUM) {
+            continueWork = false;
+            let tooMuchVideoContainersElement = new TooMuchVideoContainers(
+                `You are not allowed to have more than ${MAX_VIDEO_CONTAINER_NUM} video containers in one Tab!`
+            )
+            tooMuchVideoContainersElement.create()
+        }
+        // check active video containers names
+        if (continueWork) {
+            for (let i = 0; i < videoContainers.length; i++) {
+                if (videoContainers[i].state === "active" && videoContainers[i].camera === "cam_100500") {
+                    let alert = new DuplicatedCamIDMessage(
+                        "cam_100500 video is already displayed. Do you want another video container?",
+                    );
+                    alert.create(videoContainers);
+                    continueWork = false;
+                    break
+                }
+            }
+        }
+        // if okay, add another one video container
+        if (continueWork) {
+            let vContainer = new VideoContainer("cam_100500")
+            let vContainerDiv = vContainer.create_element();
+            videosContainersDiv.appendChild(vContainerDiv);
+            // is used on tab close
+            videoContainers.push(vContainer);
+        }
     })
 
-    // close socket on tab close
+    // close sockets on tab close
     window.addEventListener("beforeunload", function(e){
         for (let i=0; i<videoContainers.length; i++) {
             // check state of video container
@@ -54,6 +87,7 @@ window.onload = (event) => {
 
 class VideoContainer {
     constructor(camera) {
+        this.camera = camera;
         this.ws = VideoContainer.create_ws(camera);
         this.state = "active"; // used on tab close
     }
@@ -120,6 +154,83 @@ class VideoContainer {
             VideoContainer.handle_web_socket_data(ev, video_img);
         })
         return div
+    }
+}
+
+class TooMuchVideoContainers {
+    /**
+     * Message which informs us that we have too much video Containers in One Page
+     * @param text - What you would like to say
+     */
+    constructor(text) {
+        this.text = text;
+    }
+    create() {
+        const div = document.createElement("div");
+        const btnColorMode = document.getElementById("color_mode");
+        let colorMode = "dark";
+        if (btnColorMode.className.includes("dark")) {
+            colorMode = "dark";
+        } else {
+            colorMode = "light";
+        }
+        div.className = `alert ${colorMode}`;
+        div.innerHTML = "<h2>" + this.text + "</h2>";
+        const btnClose = document.createElement("button");
+        btnClose.className = `alert_btn ${colorMode}`;
+        btnClose.innerText = "Fine";
+        div.appendChild(btnClose);
+        document.body.appendChild(div);
+
+        btnClose.addEventListener("click", ev => {
+            ev.target.parentElement.parentElement.removeChild(ev.target.parentElement);
+        })
+    }
+}
+
+class DuplicatedCamIDMessage {
+    /**
+     * Message which informs us that camera with the certain name already displayed in on of Video Containers
+     * @param text - What you would like to say
+     */
+    constructor(text) {
+        this.text = text;
+    }
+    create(containers) {
+        const div = document.createElement("div");
+        const btnColorMode = document.getElementById("color_mode");
+        let colorMode = "dark";
+        if (btnColorMode.className.includes("dark")) {
+            colorMode = "dark";
+        } else {
+            colorMode = "light";
+        }
+        div.className = `alert ${colorMode}`;
+        div.innerHTML = "<h2>" + this.text + "</h2>";
+        const btnYes = document.createElement("button");
+        btnYes.className = `alert_btn ${colorMode}`;
+        btnYes.innerText = "Yes"
+        const btnNo = document.createElement("button");
+        btnNo.className = `alert_btn ${colorMode}`;
+        btnNo.innerText = "No"
+        div.appendChild(btnYes);
+        div.appendChild(btnNo);
+        document.body.appendChild(div);
+
+        btnNo.addEventListener("click", ev => {
+            ev.target.parentElement.parentElement.removeChild(ev.target.parentElement);
+        })
+
+        btnYes.addEventListener("click", ev => {
+            const videosContainersDiv = document.getElementById("videos_containers");
+            let vContainer = new VideoContainer("cam_100500");
+            let vContainerDiv = vContainer.create_element();
+            videosContainersDiv.appendChild(vContainerDiv);
+
+            ev.target.parentElement.parentElement.removeChild(ev.target.parentElement);
+            // is used on tab close
+            containers.push(vContainer);
+        })
     }
 }
 

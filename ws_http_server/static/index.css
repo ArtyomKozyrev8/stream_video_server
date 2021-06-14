@@ -1,3 +1,58 @@
+.alert {
+    position: absolute;
+    width: calc(40% - 60px);
+    padding-bottom: 20px;
+    top: 40%;
+    z-index: 5;
+    margin-left: 30%;
+    text-align: center;
+
+}
+
+.alert.dark {
+    background-color: aliceblue;
+    color: black;
+    border: 3px solid lightgrey;
+}
+
+.alert.light {
+    background-color: black;
+    color: aliceblue;
+    border: 3px solid lightgrey;
+}
+
+.alert_btn {
+    width: 70px;
+    height: 30px;
+    margin-right: 20px;
+    font-size: 20px;
+    text-align: center;
+}
+
+.alert_btn.dark {
+    background-color: aliceblue;
+    color: black;
+    border: 3px solid black;
+}
+
+.alert_btn.dark:hover {
+    background: darkgray;
+    color: white;
+    border: 3px solid darkgray;
+}
+
+.alert_btn.light {
+    background-color: black;
+    color: whitesmoke;
+    border: 3px solid lightgrey;
+}
+
+.alert_btn.light:hover {
+    background: whitesmoke;
+    color: black;
+    border: 3px solid black;
+}
+
 body {
     margin-left: 30px;
     margin-right: 30px;
@@ -129,8 +184,9 @@ button.remove_btn {
 }
 
 button.remove_btn:hover {
-    background-color: darkgray;
+    background-color: black;
     color: aliceblue;
+    border: 2px solid aliceblue;
 }
 
 .video_container {
