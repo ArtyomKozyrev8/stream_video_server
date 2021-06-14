@@ -14,8 +14,7 @@ more tutorial-like code, start from the 1st and the 2nd implementations.
 
 The application is composed of two services: 1. http server 2. video processing process 3. Optionally Nginx
 
-![Screenshot One](screen_shorts/gif-1.gif)
-![Screenshot Two](screen_shorts/gif-2.gif)
+![Demo](screen_shorts/demo-1.gif)
 
 ### **First One: The Easiest Video Server Implementation:**
 
