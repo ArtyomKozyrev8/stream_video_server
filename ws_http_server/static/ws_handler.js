@@ -6,7 +6,6 @@ window.onload = (event) => {
     // div to store video-containers divs
     const videosContainersDiv = document.getElementById("videos_containers");
     const camera_list_box_ops = new CameraListBoxOps();     // ops related to camera selector
-    const btnAdd = document.getElementById("addBtn"); // temp btn
     // list of video containers, used to close ws if browser tav is closed
     const videoContainers = new Array();
 
@@ -34,7 +33,8 @@ window.onload = (event) => {
         }
     })
     // adds another one VideoContainer
-    btnAdd.addEventListener("click", ev => {
+    camerasSelect.addEventListener("change", ev => {
+        let camID = ev.target.value;
         // check if we already have
         let continueWork = true;
         let n = 0;
@@ -54,11 +54,11 @@ window.onload = (event) => {
         // check active video containers names
         if (continueWork) {
             for (let i = 0; i < videoContainers.length; i++) {
-                if (videoContainers[i].state === "active" && videoContainers[i].camera === "cam_100500") {
+                if (videoContainers[i].state === "active" && videoContainers[i].camera === camID) {
                     let alert = new DuplicatedCamIDMessage(
-                        "cam_100500 video is already displayed. Do you want another video container?",
+                        `${camID} video is already displayed. Do you want another video container?`,
                     );
-                    alert.create(videoContainers);
+                    alert.create(videoContainers, camID);
                     continueWork = false;
                     break
                 }
@@ -66,12 +66,13 @@ window.onload = (event) => {
         }
         // if okay, add another one video container
         if (continueWork) {
-            let vContainer = new VideoContainer("cam_100500")
+            let vContainer = new VideoContainer(camID)
             let vContainerDiv = vContainer.create_element();
             videosContainersDiv.appendChild(vContainerDiv);
             // is used on tab close
             videoContainers.push(vContainer);
         }
+        ev.target.selectedIndex = 0; // unselect item
     })
 
     // close sockets on tab close
@@ -181,9 +182,14 @@ class TooMuchVideoContainers {
         btnClose.innerText = "Fine";
         div.appendChild(btnClose);
         document.body.appendChild(div);
+        const camerasSelect = document.getElementById("cameras");
+        // prevent choosing other cameras
+        camerasSelect.setAttribute("disabled", "disabled");
 
         btnClose.addEventListener("click", ev => {
             ev.target.parentElement.parentElement.removeChild(ev.target.parentElement);
+            const camerasSelect = document.getElementById("cameras");
+            camerasSelect.removeAttribute("disabled");
         })
     }
 }
@@ -196,7 +202,7 @@ class DuplicatedCamIDMessage {
     constructor(text) {
         this.text = text;
     }
-    create(containers) {
+    create(containers, cam_id) {
         const div = document.createElement("div");
         const btnColorMode = document.getElementById("color_mode");
         let colorMode = "dark";
@@ -216,20 +222,27 @@ class DuplicatedCamIDMessage {
         div.appendChild(btnYes);
         div.appendChild(btnNo);
         document.body.appendChild(div);
+        const camerasSelect = document.getElementById("cameras");
+        // prevent choosing other cameras
+        camerasSelect.setAttribute("disabled", "disabled");
 
         btnNo.addEventListener("click", ev => {
             ev.target.parentElement.parentElement.removeChild(ev.target.parentElement);
+            const camerasSelect = document.getElementById("cameras");
+            camerasSelect.removeAttribute("disabled");
         })
 
         btnYes.addEventListener("click", ev => {
             const videosContainersDiv = document.getElementById("videos_containers");
-            let vContainer = new VideoContainer("cam_100500");
+            let vContainer = new VideoContainer(cam_id);
             let vContainerDiv = vContainer.create_element();
             videosContainersDiv.appendChild(vContainerDiv);
 
             ev.target.parentElement.parentElement.removeChild(ev.target.parentElement);
             // is used on tab close
             containers.push(vContainer);
+            const camerasSelect = document.getElementById("cameras");
+            camerasSelect.removeAttribute("disabled");
         })
     }
 }
