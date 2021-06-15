@@ -13,7 +13,10 @@ LOG_LEVEL = logging.INFO
 # you can choose any (not empty string) CAMERA_NAME, but should be unique if you have several processes
 # which get data from camera and send it to http server
 CAMERA_NAME = "cam_100500"
-URL = f"http://localhost:7474/video_remote_source/{CAMERA_NAME}"
+# address of remote http server, where we gonna send our images
+HTTP_SERVER = "http://localhost:7474"
+
+URL = f"{HTTP_SERVER}/video_remote_source/{CAMERA_NAME}"
 # RTMP should be 0 if you want to use default web camera
 # Otherwise you can provide rtmp link
 RTMP = 0
@@ -49,17 +52,34 @@ class CameraHandle:
         if not ret:
             app_log.error("Was not able to capture video")
             return  # raise exception is outer code
+        frame = cv.resize(
+            frame,
+            (
+                int(frame.shape[1] * 0.8),  # image new width
+                int(frame.shape[0] * 0.8),  # image new height
+             ),
+            interpolation=cv.INTER_AREA,
+        )
         ret, jpeg = cv.imencode('.jpg', frame)
         return jpeg.tobytes()
+
+    @staticmethod
+    def define_img_text_color(img):
+        """Choose color for timestamp """
+        red, green, blue = img.getpixel((10, 10))
+        if (red * 0.299 + green * 0.587 + blue * 0.114) > 150:
+            return "black"
+        return "white"
 
     @staticmethod
     def add_timestamp(img: bytes):
         """Adds current timestamp to frame from camera"""
         img = Image.open(BytesIO(img))
         draw = ImageDraw.Draw(img)
-        font = ImageFont.truetype("arial", size=20)
+        font = ImageFont.truetype("arial", size=18)
         t = datetime.now().astimezone(timezone.utc).strftime("%Y-%m-%d %Z\n%H:%M:%S\n%f ms.")
-        draw.text((10, 10), t, "black", font=font)
+        color = CameraHandle.define_img_text_color(img)
+        draw.text((10, 10), f"{CAMERA_NAME}\n{t}", color, font=font)
         new_image = BytesIO()
         img.save(new_image, format='JPEG')
         return new_image.getvalue()
