@@ -138,8 +138,8 @@ h1.dark  { color: aliceblue; }
 h1.light { color: black; }
 
 img {
-    width: 540px;
-    height: 390px;
+    width: 512px;
+    height: 384px;
     z-index: -1;
     position: absolute;
 }
@@ -180,7 +180,6 @@ button.remove_btn {
     border: 2px solid black;
     float: right;
     margin-top: 8px;
-    margin-right: 12px;
 }
 
 button.remove_btn:hover {
@@ -190,8 +189,8 @@ button.remove_btn:hover {
 }
 
 .video_container {
-    width: 550px;
-    height: 400px;
+    width: 512px;
+    height: 384px;
     margin-top: 10px;
     margin-right: 10px;
     justify-content: flex-start;
