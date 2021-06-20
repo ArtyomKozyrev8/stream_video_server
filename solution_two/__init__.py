@@ -65,9 +65,9 @@ async def websocket_handler_site(req: web.Request):
 def create_app(args=None) -> web.Application:
     """app factory"""
     app = web.Application()
-    app.add_routes([web.static('/static', "easy_ws_http_server/static")])
+    app.add_routes([web.static('/static', "solution_two/static")])
     cap = cv.VideoCapture(0)  # when we start http server, we open default usb camera
     app["cap"] = cap
     app.add_routes(routes)
-    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("easy_ws_http_server/templates"))
+    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("solution_two/templates"))
     return app
