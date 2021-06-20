@@ -66,7 +66,9 @@ _1. How to run Websocket Video Server Implementation:_
 
 2. install all requirement from `requirement.txt`
 
-3. `python -m aiohttp.web -H 0.0.0.0 -P 7474 ws_http_server:create_app` // `python3` in Linux
+3. `cd solution_three`
+
+4. `python -m aiohttp.web -H 0.0.0.0 -P 7474 ws_http_server:create_app` // `python3` in Linux
 
 _2. How to run Video Processing Process_
 
@@ -74,7 +76,7 @@ _2. How to run Video Processing Process_
 
 2. install all requirement from `requirement.txt`
 
-3. `python video_source_process/vid_s_pr.py` // `python3` in Linux
+3. `python solution_three/video_source_process/vid_s_pr.py` // `python3` in Linux
  
 _PROs:_
 
@@ -88,18 +90,18 @@ _Cons:_
 
 1. Do not scale well, only one http process can work simultaneously. 
 
-##### **_How to deploy application with Docker or/and Docker-Compose:_**
+##### **_How to deploy application (3rd solution) with Docker or/and Docker-Compose:_**
 
 **_Note:_** you still have to run `python video_source_process/vid_s_pr.py` (Video Processing App) without Docker, though it is possible
 to run OpenCV app in docker, you need to to use `--device=` docker flag to use default camera by index.
 
 1. Create Images and run with the help of Docker-Compose:
 
-1.1 `docker build -t video_ng . // run command in nginx folder`
+1.1 `docker build -t video_ng . // run command in solution_three/nginx folder`
 
-1.2 `docker build -t video_server . // run command in ws_http_server folder`
+1.2 `docker build -t video_server . // run command in solution_three/ws_http_server folder`
 
-1.3 `docker-compose up -d // run command in stream_video_server folder`
+1.3 `docker-compose up -d // run command in solution_three folder`
 
 2. Create Images and run with the help of Docker only:
 

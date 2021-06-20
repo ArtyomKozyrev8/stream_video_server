@@ -2,10 +2,10 @@ FROM python:3.9
 
 WORKDIR /usr/src/ws_http_server
 
-COPY ../requirements.txt ./
+COPY ../../requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY .. .
+COPY ../.. .
 
 WORKDIR /usr/src/
 
