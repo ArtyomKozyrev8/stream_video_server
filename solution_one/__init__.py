@@ -46,7 +46,7 @@ async def get_one_image(req: web.Request) -> web.Response:
         "Content-Type": "multipart/x-mixed-replace;boundary=frame"
     }
 
-    with open(r"easy_http_server/static/test_image.jpg", "rb") as image_file:
+    with open(r"solution_one/static/test_image.jpg", "rb") as image_file:
         data = b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + image_file.read() + b'\r\n\r\n'
 
     return web.Response(body=data, status=200, headers=headers)
@@ -78,5 +78,5 @@ def create_app(args=None) -> web.Application:
     cap = cv.VideoCapture(0)  # when we start http server, we open default usb camera
     app["cap"] = cap
     app.add_routes(routes)
-    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("easy_http_server/templates"))
+    aiohttp_jinja2.setup(app, loader=jinja2.FileSystemLoader("solution_one/templates"))
     return app

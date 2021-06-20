@@ -24,7 +24,7 @@ _How to run The Easiest Video Server Implementation:_
 
 2. install all requirement from `requirement.txt`
 
-3. `python -m aiohttp.web -H 0.0.0.0 -P 7474 easy_http_server:create_app` // `python3` in Linux
+3. `python -m aiohttp.web -H 0.0.0.0 -P 7575 solution_one:create_app` // `python3` in Linux
 
 _PROs:_
 
